@@ -12,7 +12,7 @@ class Queue
      Queue()
      {
      }
-     Queue(std::initializer_list<T> x) : c(x)
+     Queue(std::initializer_list<T> l) : c(l)
      {
      }
 
@@ -51,7 +51,7 @@ class Queue
      }
      Queue<T>& operator=(const Queue<T>& other)
      {
-	     c = other.c;
+       c = other.c;
        return *this;
      }
 
