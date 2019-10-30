@@ -6,8 +6,7 @@ CXXFLAGS =-Wall -g
 all: runtests
 
 runtests: runtests.o
-runtests.o: List.h
+runtests.o: List.h Stack.h Queue.h
 
 clean:
 	rm -f runtests *.o
-

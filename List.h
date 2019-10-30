@@ -2,6 +2,8 @@
 #define __EE231_List_h__
 
 #include <cstddef>
+#include <iostream>
+#include <initializer_list>
 
 template<typename T>
 class List
@@ -34,17 +36,26 @@ class List
 	// default constructor
 	List()
 	{
-		_head = 0;
-		_tail = 0;
+		_head = nullptr;
+		_tail = nullptr;
 		_size = 0;
 	}
 
 	// copy constructor
 	List(const List& other)
 	{
-		_head = 0;
+		_head = nullptr;
 		_size = 0;
+		//llist *ptr = other.getHead();
+		//for (; ptr != nullptr; ptr = ptr->next)
+		//	push_back(ptr->value);
 		reccopy(other.getHead());
+	}
+
+	List(std::initializer_list<T> l) : _head(nullptr), _tail(nullptr), _size(0)
+	{
+		for(auto value: l)
+			push_back(value);
 	}
 
 	// destructor
@@ -57,16 +68,17 @@ class List
 	List& operator=(const List& other)
 	{
 		clear();
+		_head = nullptr;
+		_size = 0;
 		reccopy(other.getHead());
-		_size = other.size();
 		return *this;
 	}
 
-	T::llist * getHead() const
+	 List::llist * getHead() const
 	{
 	  return _head;
 	}
-	T::llist * getTail() const
+	 List::llist * getTail() const
 	{
 	  return _tail;
 	}
@@ -77,7 +89,7 @@ class List
 	}
 	bool empty() const
 	{
-		return _head == 0;
+		return (_head == nullptr) && (_tail == nullptr);
 	}
 	size_t size() const
 	{
@@ -106,10 +118,10 @@ class List
 		llist *newItem = new llist;
 		newItem->val = val;
 		newItem->next = _head;
-		newItem->prev = 0;
-		if (_head != 0)
+		newItem->prev = nullptr;
+		if (_head != nullptr)
 			_head->prev = newItem;
-		if (_tail == 0)
+		if (_tail == nullptr)
 			_tail = newItem;
 		_head = newItem;
 		_size++;
@@ -119,10 +131,10 @@ class List
 		llist *newItem = new llist;
 		newItem->val = val;
 		newItem->prev = _tail;
-		newItem->next = 0;
-		if (_tail != 0)
+		newItem->next = nullptr;
+		if (_tail != nullptr)
 			_tail->next = newItem;
-		if (_head == 0)
+		if (_head == nullptr)
 			_head = newItem;
 		_tail = newItem;
 		_size++;
@@ -134,10 +146,10 @@ class List
 		{
 			llist *front = _head;
 			_head = _head->next;
-			if (_head != 0)
+			if (_head != nullptr)
 				_head->prev = _head->prev->prev;
 			else
-				_tail = 0;
+				_tail = nullptr;
 			delete front;
 			_size--;
 		}
@@ -148,10 +160,10 @@ class List
 		{
 			llist *back = _tail;
 			_tail = _tail->prev;
-			if (_tail != 0)
+			if (_tail != nullptr)
 				_tail->next = _tail->next->next;
 			else
-				_head = 0;
+				_head = nullptr;
 			delete back;
 			_size--;
 		}
@@ -159,12 +171,12 @@ class List
 
 	void reverse()
 	{
-	  if ((!empty()) && (_head->next != 0))
+	  if ((!empty()) && (_head->next != nullptr))
 	  {
 	    llist *temp;
 	    llist *ptr = _head;
 
-	    while (ptr != 0)
+	    while (ptr != nullptr)
 	    {
 	      temp = ptr->prev;
 	      ptr->prev = ptr->next;
@@ -179,14 +191,14 @@ class List
 	}
 	void unique()
 	{
-	  for(llist *ptr = _head; ptr != 0; ptr = ptr->next)
+	  for(llist *ptr = _head; ptr != nullptr; ptr = ptr->next)
 	    {
-	    	while ((ptr->next != 0) && (ptr->str == ptr->next->str))
+	    	while ((ptr->next != nullptr) && (ptr->val == ptr->next->val))
 	    	{
 	        llist *saveptr = ptr->next;
 	        ptr->next = saveptr->next;
 
-	        if (saveptr->next != 0)
+	        if (saveptr->next != nullptr)
 	          saveptr->next->prev = ptr;
 	        else
 	          _tail = ptr;
@@ -197,7 +209,51 @@ class List
 	    }
 	}
 
+	void print() const
+	{
+	  for (llist *ptr = _head; ptr != NULL; ptr = ptr->next)
+	      std::cout << ptr->val << " ";
+	  std::cout << std::endl;
+	}
 
+	template<typename V>
+	friend bool operator==(const List<V>&, const List<V>&);
+	template<typename V>
+	friend bool operator!=(const List<V>&, const List<V>&);
 };
+
+template<typename T>
+bool operator==(const List<T>& a, const List<T>& b)
+{
+	if(a.size() != b.size())
+		return false;
+
+	auto aptr = a.getHead();
+	auto bptr = b.getHead();
+
+	for(; aptr != nullptr && bptr != nullptr; aptr = aptr->next, bptr = bptr->next)
+	{
+		if(aptr->val != bptr->val)
+			return false;
+	}
+	return true;
+}
+
+template<typename T>
+bool operator!=(const List<T>& a, const List<T>& b)
+{
+	if(a.size() != b.size())
+		return true;
+
+	auto aptr = a.getHead(); // const typename List<T>::llist *aptr = a.getHead();
+	auto bptr = b.getHead();
+
+	for(; aptr != nullptr && bptr != nullptr; aptr = aptr->next, bptr = bptr->next)
+	{
+		if(aptr->val != bptr->val)
+			return true;
+	}
+	return false;
+}
 
 #endif // __EE231_List_h__
